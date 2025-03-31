@@ -13,9 +13,29 @@ import { useRouter } from 'vue-router';
 
 const validationSchema = yup.object({
   titulo: yup.string().required(),
-  descricao: yup.string().required(),
-  preco: yup.number().required(),
   custo: yup.number().required().min(1),
+  preco: yup
+  .number()
+  .required()
+  .test(
+    "preco-minimo",
+    "O preço deve ser no mínimo 10% maior que o custo",
+    function (preco) {
+      const { custo } = this.parent;
+      return preco >= custo * 1.1;
+    }
+  ),
+  descricao: yup
+  .string()
+  .required()
+  .test(
+    "html-tags",
+    "A descrição só pode conter as tags <p>, <br>, <b> e <strong>",
+    (descricao) => {
+      const regex = /^([\s\S]*?(<(p|br|b|strong)[^>]*>[\s\S]*?<\/?(p|br|b|strong)>)*[\s\S]*)*$/i;
+      return regex.test(descricao);
+    }
+  ),
 });
 
 
