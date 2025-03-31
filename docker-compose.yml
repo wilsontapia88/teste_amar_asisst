@@ -1,0 +1,46 @@
+services:
+  app:
+    build:
+      context: .
+    image: assist_app
+    container_name: assist_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./app:/var/www
+    networks:
+      - laravel_network
+
+  web:
+    image: nginx:latest
+    container_name: assist_nginx
+    restart: unless-stopped
+    ports:
+      - "9090:80"  # Alterado para 9080:80
+    volumes:
+      - ./app:/var/www
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - laravel_network
+      
+  mysql:
+    image: mysql:8.0
+    container_name: assist_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+    ports:
+      - "9040:3306"  # Alterado para 9036:3306
+    volumes:
+      - mysql8_data:/var/lib/mysql
+    networks:
+      - laravel_network
+
+networks:
+  laravel_network:
+
+volumes:
+  mysql8_data:
